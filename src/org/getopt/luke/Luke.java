@@ -825,7 +825,8 @@ public class Luke extends Thinlet implements ClipboardOwner {
     }
     try {
       IndexWriter iw = createIndexWriter();
-      iw.commit(userData);
+      iw.setCommitData(userData);
+      iw.commit();
       iw.close();
       refreshAfterWrite();
     } catch (Exception e) {
@@ -1194,9 +1195,9 @@ public class Luke extends Thinlet implements ClipboardOwner {
       Object iTiiDiv = find(pOver, "iTiiDiv");
       String divText = "N/A";
       if (ir instanceof DirectoryReader) {
-        List<? extends AtomicReader> readers = ((DirectoryReader)ir).getSequentialSubReaders();
-        if (readers.size() > 0 && readers.get(0) instanceof SegmentReader) {
-          divText = String.valueOf(((SegmentReader)readers.get(0)).getTermInfosIndexDivisor());
+        List<AtomicReaderContext> contexts = ir.leaves();
+        if (contexts.size() > 0 && contexts.get(0).reader() instanceof SegmentReader) {
+          divText = String.valueOf(((SegmentReader)contexts.get(0).reader()).getTermInfosIndexDivisor());
         }
       }
       setString(iTiiDiv, "text", divText);
@@ -3646,7 +3647,7 @@ public class Luke extends Thinlet implements ClipboardOwner {
     SlowThread st = new SlowThread(this) {
       public void execute() {
         try {
-          DocsEnum td = ar.termDocsEnum(ar.getLiveDocs(), t.field(), new BytesRef(t.text()), 0);
+          DocsAndPositionsEnum td = ar.termPositionsEnum(new Term(t.field(), t.bytes()));
           if (td == null) {
             showStatus("No such term: " + t);
             return;
@@ -3746,7 +3747,11 @@ public class Luke extends Thinlet implements ClipboardOwner {
           if (withOffsets) {
             flags |= DocsAndPositionsEnum.FLAG_OFFSETS;
           }
-          DocsAndPositionsEnum td = ar.termPositionsEnum(ar.getLiveDocs(), t.field(), t.bytes(), flags);
+          /**
+           * TODO check if it is ok to discard "flags"
+           * Previous usage is DocsAndPositionsEnum td = ar.termPositionsEnum(ar.getLiveDocs(), t.field(), t.bytes(), flags);
+           */
+          DocsAndPositionsEnum td = ar.termPositionsEnum(new Term(t.field(), t.bytes()));
           if (td == null) {
             showStatus("No position information available for this term.");
             return;
@@ -3782,8 +3787,8 @@ public class Luke extends Thinlet implements ClipboardOwner {
               }
               cell = create("cell");
               add(r, cell);
-              if (td.hasPayload()) {
-                BytesRef payload = td.getPayload();
+              BytesRef payload = td.getPayload();
+              if (payload!=null) {
                 putProperty(r, "payload", (BytesRef)payload.clone());
               }
               add(pTable, r);
