@@ -62,7 +62,7 @@
 				excludes="org/getopt/luke/plugins,**/*.js,**/Thumbs.db">
 			<manifest>
 				<attribute name="Main-Class" value="org.getopt.luke.Luke"/>
-				<attribute name="Classpath" value="lucene-core-4.0.0-BETA.jar;js.jar;lucene-misc-4.0.0-BETA.jar"/>
+				<attribute name="Class-Path" value="lucene-core-${build.ver}.jar js.jar lucene-misc-${build.ver}.jar lucene-queryparser-${build.ver}.jar lucene-analyzers-common-${build.ver}.jar lucene-queries-${build.ver}.jar solr-core-${build.ver}.jar solr-solrj-${build.ver}.jar"/>
 			</manifest>
 		</jar>
 		<unjar dest="${build.dir}">
@@ -74,7 +74,7 @@
 		        excludes="org/mozilla/,org/getopt/luke/plugins,**/*.js">
 			<manifest>
 				<attribute name="Main-Class" value="org.getopt.luke.Luke"/>
-				<attribute name="Classpath" value="lucene-core-4.0.0-BETA.jar;lucene-misc-4.0.0-BETA.jar"/>
+				<attribute name="Class-Path" value="lucene-core-${build.ver}.jar lucene-misc-${build.ver}.jar lucene-queryparser-${build.ver}.jar lucene-analyzers-common-${build.ver}.jar lucene-queries-${build.ver}.jar solr-core-${build.ver}.jar solr-solrj-${build.ver}.jar"/>
 			</manifest>
 		</jar>
 		<unjar dest="${build.dir}">
@@ -85,7 +85,7 @@
 			<fileset dir="lib" includes="hadoop/*.jar"/>
 		</unjar>
 		<unjar dest="${build.dir}">
-			<fileset dir="lib" includes="solr/*.jar"/>
+			<fileset dir="lib" includes="solr-*.jar"/>
 		</unjar>
 		<unjar dest="${build.dir}">
 			<fileset dir="lib" includes="lucene-core-*.jar"/>
